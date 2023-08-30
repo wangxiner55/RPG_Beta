@@ -4,10 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
 #include "EcCharacterBase.generated.h"
 
+
+
+class UAbilitySystemComponent;
+class UAttributeSet;
+
 UCLASS()
-class RPG_BETA_API AEcCharacterBase : public ACharacter
+class RPG_BETA_API AEcCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -15,15 +21,26 @@ public:
 	// Sets default values for this character's properties
 	AEcCharacterBase();
 
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	FORCEINLINE UAttributeSet* GetAttributeSet() const{ return AttributeSet; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<USkeletalMeshComponent> Weapon;
+
+	UPROPERTY()
+		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+		TObjectPtr<UAttributeSet> AttributeSet;
+
+public:	
+
 
 };
