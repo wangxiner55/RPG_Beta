@@ -5,6 +5,7 @@
 #include "AbilitySystem/EcAbilitySystemComponent.h"
 #include "AbilitySystem/EcAttributeSet.h"
 
+
 AEcMinion::AEcMinion()
 {
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
@@ -31,8 +32,14 @@ void AEcMinion::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
+
+
+}
+
+void AEcMinion::InitAbilityActorInfo()
+{
 	check(AbilitySystemComponent);
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
-
+	Cast<UEcAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 }

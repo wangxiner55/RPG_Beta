@@ -28,3 +28,7 @@ void AEcCharacterBase::BeginPlay()
 	
 }
 
+void AEcCharacterBase::InitAbilityActorInfo()
+{
+}
+

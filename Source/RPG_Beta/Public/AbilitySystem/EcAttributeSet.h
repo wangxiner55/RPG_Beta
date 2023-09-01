@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
+
 #include "AbilitySystemComponent.h"
 #include "EcAttributeSet.generated.h"
 
@@ -14,6 +15,42 @@
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
+
+USTRUCT()
+struct FEffectProperties
+{
+	GENERATED_BODY()
+
+	FEffectProperties(){}
+
+	FGameplayEffectContextHandle EffectContextHandle;
+
+	UPROPERTY()
+		UAbilitySystemComponent* SourceASC = nullptr;
+
+	UPROPERTY()
+		AActor* SourceAvatarActor = nullptr;
+
+	UPROPERTY()
+		AController* SourceController = nullptr;
+
+	UPROPERTY()
+		ACharacter* SourceCharacter = nullptr;
+
+
+	UPROPERTY()
+		UAbilitySystemComponent* TargetASC = nullptr;
+
+	UPROPERTY()
+		AActor* TargetAvatarActor = nullptr;
+
+	UPROPERTY()
+		AController* TargetController = nullptr;
+
+	UPROPERTY()
+		ACharacter* TargetCharacter = nullptr;
+
+};
 /**
  * 
  */
@@ -28,18 +65,25 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty >& OutLifetimeProps) const;
 
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
+
 
 	UPROPERTY(BlueprintReadOnly ,ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(UEcAttributeSet, Health);
 
+
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "Vital Attributes")
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(UEcAttributeSet, MaxHealth);
 
+
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category = "Vital Attributes")
 	FGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(UEcAttributeSet, Mana);
+
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxMana, Category = "Vital Attributes")
 	FGameplayAttributeData MaxMana;
@@ -57,4 +101,8 @@ public:
 
 	UFUNCTION()
 		void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
+
+private:
+
+	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
 };

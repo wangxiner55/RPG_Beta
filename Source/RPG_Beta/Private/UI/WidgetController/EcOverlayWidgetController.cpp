@@ -4,6 +4,7 @@
 #include "UI/WidgetController/EcOverlayWidgetController.h"
 #include "AbilitySystem/EcAttributeSet.h"
 #include "GameplayEffectTypes.h"
+#include "AbilitySystem/EcAbilitySystemComponent.h"
 
 
 
@@ -15,6 +16,7 @@ void UEcOverlayWidgetController::BroadcastInitialValues()
 	OnMaxHealthChanged.Broadcast(EcAttributeSet->GetMaxHealth());
 	OnManaChanged.Broadcast(EcAttributeSet->GetMana());
 	OnMaxManaChanged.Broadcast(EcAttributeSet->GetMaxMana());
+	
 }
 
 void UEcOverlayWidgetController::BindCallbacksToDependencies()
@@ -23,37 +25,58 @@ void UEcOverlayWidgetController::BindCallbacksToDependencies()
 	UEcAttributeSet* EcAttributeSet = CastChecked<UEcAttributeSet>(AttributeSet);
 	AbilitySystemComponent
 		->GetGameplayAttributeValueChangeDelegate(EcAttributeSet->GetHealthAttribute())
-		.AddUObject(this, &UEcOverlayWidgetController::HealthChanged);
+		.AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnHealthChanged.Broadcast(Data.NewValue);
+			}
+	);
+
 	AbilitySystemComponent
 		->GetGameplayAttributeValueChangeDelegate(EcAttributeSet->GetMaxHealthAttribute())
-		.AddUObject(this, &UEcOverlayWidgetController::MaxHealthChanged);
+		.AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxHealthChanged.Broadcast(Data.NewValue);
+			}
+	);
+
 	AbilitySystemComponent
 		->GetGameplayAttributeValueChangeDelegate(EcAttributeSet->GetManaAttribute())
-		.AddUObject(this, &UEcOverlayWidgetController::ManaChanged);
+		.AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnManaChanged.Broadcast(Data.NewValue);
+			}
+	);
+
 	AbilitySystemComponent
 		->GetGameplayAttributeValueChangeDelegate(EcAttributeSet->GetMaxManaAttribute())
-		.AddUObject(this, &UEcOverlayWidgetController::MaxManaChanged);
+		.AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxManaChanged.Broadcast(Data.NewValue);
+			}
+	);
 
+	Cast<UEcAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
+		[this](const FGameplayTagContainer& AssetTags)
+		{
+			for (const FGameplayTag tag : AssetTags)
+			{
+
+				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+				if (tag.MatchesTag(MessageTag))
+				{
+					FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, tag);
+					MessageWidgetRowDelegate.Broadcast(*Row);
+				}
+
+				GEngine->AddOnScreenDebugMessage(-1, 8.0, FColor::Blue, "Hight");
+
+				
+			}
+		}
+	);
 }
 
-
-
-void UEcOverlayWidgetController::HealthChanged(const FOnAttributeChangeData& Data)
-{
-	OnHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UEcOverlayWidgetController::MaxHealthChanged(const FOnAttributeChangeData& Data)
-{
-	OnMaxHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UEcOverlayWidgetController::ManaChanged(const FOnAttributeChangeData& Data)
-{
-	OnManaChanged.Broadcast(Data.NewValue);
-}
-
-void UEcOverlayWidgetController::MaxManaChanged(const FOnAttributeChangeData& Data)
-{
-	OnMaxManaChanged.Broadcast(Data.NewValue);
-}

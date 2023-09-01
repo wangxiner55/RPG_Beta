@@ -6,6 +6,7 @@
 #include "Player/EcPlayerController.h"
 #include "Player/EcPlayerState.h"
 #include "UI/HUD/EcHUD.h"
+#include "AbilitySystem/EcAbilitySystemComponent.h"
 
 AEcCharacter::AEcCharacter()
 {
@@ -43,6 +44,7 @@ void AEcCharacter::InitAbilityActorInfo()
 	check(EcPlayerState);
 	EcPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(EcPlayerState, this);
 	AbilitySystemComponent = EcPlayerState->GetAbilitySystemComponent();
+	Cast<UEcAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 	AttributeSet = EcPlayerState->GetAttributeSet();
 
 	if (AEcPlayerController* EcPlayerController = Cast<AEcPlayerController>(GetController()))
