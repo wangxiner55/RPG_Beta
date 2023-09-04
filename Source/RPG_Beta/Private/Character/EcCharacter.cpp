@@ -37,6 +37,14 @@ void AEcCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+int32 AEcCharacter::GetPlayerLevel()
+{
+	const AEcPlayerState* EcPlayerState = GetPlayerState<AEcPlayerState>();
+	check(EcPlayerState);
+	return EcPlayerState->GetPlayerLevel();
+	
+}
+
 void AEcCharacter::InitAbilityActorInfo()
 {
 
@@ -45,6 +53,7 @@ void AEcCharacter::InitAbilityActorInfo()
 	EcPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(EcPlayerState, this);
 	AbilitySystemComponent = EcPlayerState->GetAbilitySystemComponent();
 	Cast<UEcAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
+	
 	AttributeSet = EcPlayerState->GetAttributeSet();
 
 	if (AEcPlayerController* EcPlayerController = Cast<AEcPlayerController>(GetController()))
@@ -55,4 +64,6 @@ void AEcCharacter::InitAbilityActorInfo()
 			EcHUD->InitOverlay(EcPlayerController, EcPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+
+	InitializeDefaultAttributes();
 }

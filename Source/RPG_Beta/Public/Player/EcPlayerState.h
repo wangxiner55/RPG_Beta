@@ -22,16 +22,29 @@ class RPG_BETA_API AEcPlayerState : public APlayerState, public IAbilitySystemIn
 public:
 	AEcPlayerState();
 
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
+	int32 GetPlayerLevel() const;
+
 protected:
 
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()
 		TObjectPtr<UAttributeSet> AttributeSet;
+
+
+private:
+
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Level, Category = "Character Class Defaults")
+	int32 Level = 1;
+
+	UFUNCTION()
+	void OnRep_Level(int32 OldLevel);
 };

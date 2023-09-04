@@ -25,6 +25,10 @@ public:
 	virtual void UnHighlightActor() override;
 	/* End Minion Interface*/
 
+	/* Combat Interface*/
+	virtual int32 GetPlayerLevel() override;
+	/* Combat Interface*/
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -37,5 +41,8 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		bool bHighlighted = false;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
+		int32 Level = 1;
 
 };

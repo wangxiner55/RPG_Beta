@@ -4,6 +4,7 @@
 #include "../../Public/Character/EcCharacterBase.h"
 #include "AbilitySystem/EcAbilitySystemComponent.h"
 #include "AbilitySystem/EcAttributeSet.h"
+#include "AbilitySystemComponent.h"
 
 // Sets default values
 AEcCharacterBase::AEcCharacterBase()
@@ -30,5 +31,22 @@ void AEcCharacterBase::BeginPlay()
 
 void AEcCharacterBase::InitAbilityActorInfo()
 {
+}
+
+void AEcCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffect, float Level) const
+{
+	check(IsValid(GetAbilitySystemComponent()));
+	check(GameplayEffect);
+	FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	ContextHandle.AddSourceObject(this);
+	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffect, Level, ContextHandle);
+	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+}
+
+void AEcCharacterBase::InitializeDefaultAttributes() const
+{
+	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.0f);
+	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.0f);
+	ApplyEffectToSelf(DefaultVitalAttributes, 1.0f);
 }
 

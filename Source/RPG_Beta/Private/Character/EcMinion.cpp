@@ -28,6 +28,11 @@ void AEcMinion::UnHighlightActor()
 	GetMesh()->SetRenderCustomDepth(false);
 }
 
+int32 AEcMinion::GetPlayerLevel()
+{
+	return Level;
+}
+
 void AEcMinion::BeginPlay()
 {
 	Super::BeginPlay();

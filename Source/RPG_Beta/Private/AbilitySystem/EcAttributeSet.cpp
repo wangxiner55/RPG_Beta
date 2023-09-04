@@ -11,19 +11,42 @@
 UEcAttributeSet::UEcAttributeSet()
 {
 	InitHealth(100.f);
-	InitMaxHealth(100.f);
 	InitMana(100.f);
-	InitMaxMana(100.f);
 }
 
 void UEcAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, Health, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, Mana, COND_None, REPNOTIFY_Always);
+	/*
+	* Secondary Attributes
+	*/
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, ArmorPenetration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, BlockChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, CriticalHitChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, CriticalHitDamage, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, CriticalHitResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, HealthRegeneration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, ManaRegeneration, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+
+
+	/*
+	* Primary Attributes
+	*/
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, Strength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, Intelligence, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, Resilience, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, Vigor, COND_None, REPNOTIFY_Always);
+
+	/*
+	*Vital Attributes
+	*/
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, Mana, COND_None, REPNOTIFY_Always);
+
 }
 
 void UEcAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -57,6 +80,34 @@ void UEcAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 	}
 }
 
+/*
+* Secondary Attributes
+*/
+
+void UEcAttributeSet::OnRep_Resilience(const FGameplayAttributeData& OldResilience) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, Resilience, OldResilience);
+}
+
+void UEcAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, Strength, OldStrength);
+}
+
+void UEcAttributeSet::OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, Intelligence, OldIntelligence);
+}
+
+void UEcAttributeSet::OnRep_Vigor(const FGameplayAttributeData& OldVigor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, Vigor, OldVigor);
+}
+
+
+/*
+* Secondary Attributes
+*/
 void UEcAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, Health, OldHealth);
@@ -76,6 +127,54 @@ void UEcAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) co
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, MaxMana, OldMaxMana);
 }
+
+
+/*
+* Secondary Attributes
+*/
+void UEcAttributeSet::OnRep_ManaRegeneration(const FGameplayAttributeData& OldManaRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, ManaRegeneration, OldManaRegeneration);
+}
+
+void UEcAttributeSet::OnRep_HealthRegeneration(const FGameplayAttributeData& OldHealthRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, HealthRegeneration, OldHealthRegeneration);
+}
+
+void UEcAttributeSet::OnRep_CriticalHitResistance(const FGameplayAttributeData& OldCriticalHitResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, CriticalHitResistance, OldCriticalHitResistance);
+}
+
+void UEcAttributeSet::OnRep_CriticalHitDamage(const FGameplayAttributeData& OldCriticalHitDamage) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, CriticalHitDamage, OldCriticalHitDamage);
+}
+
+void UEcAttributeSet::OnRep_CriticalHitChance(const FGameplayAttributeData& OldCriticalHitChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, CriticalHitChance, OldCriticalHitChance);
+}
+
+void UEcAttributeSet::OnRep_BlockChance(const FGameplayAttributeData& OldBlockChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, BlockChance, OldBlockChance);
+}
+
+void UEcAttributeSet::OnRep_ArmorPenetration(const FGameplayAttributeData& OldArmorPenetration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, ArmorPenetration, OldArmorPenetration);
+}
+
+void UEcAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, Armor, OldArmor);
+}
+
+
+
+
 
 void UEcAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
 {

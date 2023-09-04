@@ -72,8 +72,6 @@ void UEcOverlayWidgetController::BindCallbacksToDependencies()
 					MessageWidgetRowDelegate.Broadcast(*Row);
 				}
 
-				GEngine->AddOnScreenDebugMessage(-1, 8.0, FColor::Blue, "Hight");
-
 				
 			}
 		}

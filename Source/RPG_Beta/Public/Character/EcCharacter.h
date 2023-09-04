@@ -23,7 +23,9 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 
-
+	/* Comabt Interface*/
+	virtual int32 GetPlayerLevel() override;
+	/* Comabt Interface*/
 private:
 	virtual void InitAbilityActorInfo() override;
 };
