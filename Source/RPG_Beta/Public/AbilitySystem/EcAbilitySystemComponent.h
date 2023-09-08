@@ -26,6 +26,8 @@ public:
 
 	void AbilityActorInfoSet();
 
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StarupAbilities);
+
 	void EffectAppliced(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 	
 };

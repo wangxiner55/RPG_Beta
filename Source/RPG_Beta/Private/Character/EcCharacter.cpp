@@ -55,6 +55,7 @@ void AEcCharacter::InitAbilityActorInfo()
 	Cast<UEcAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 	
 	AttributeSet = EcPlayerState->GetAttributeSet();
+	InitializeDefaultAttributes();
 
 	if (AEcPlayerController* EcPlayerController = Cast<AEcPlayerController>(GetController()))
 	{
@@ -65,5 +66,5 @@ void AEcCharacter::InitAbilityActorInfo()
 		}
 	}
 
-	InitializeDefaultAttributes();
+	
 }

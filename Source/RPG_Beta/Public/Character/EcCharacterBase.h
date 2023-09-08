@@ -57,7 +57,14 @@ protected:
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffect, float Level) const;
 	void InitializeDefaultAttributes()const;
 
+
+
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StarupAbilities);
 public:	
+
+private:
+
+	TArray<TSubclassOf<UGameplayAbility>> StarupAbilities;
 
 
 };

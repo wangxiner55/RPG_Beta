@@ -5,6 +5,7 @@
 #include "UI/Widget/EcUserWidget.h"
 #include "UI/WidgetController/EcOverlayWidgetController.h"
 
+
 UEcOverlayWidgetController* AEcHUD::GetOverlayWidgetController(const FWidgetControllerParams& WCParams)
 {
 	if (OverlayWidgetController == nullptr)
@@ -16,6 +17,19 @@ UEcOverlayWidgetController* AEcHUD::GetOverlayWidgetController(const FWidgetCont
 		return OverlayWidgetController;
 	}
 	return OverlayWidgetController;
+}
+
+UAttributeMenuWidgetController* AEcHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (AttributeMenuWidgetController == nullptr)
+	{
+		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
+		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
+		AttributeMenuWidgetController->BindCallbacksToDependencies();
+
+		return AttributeMenuWidgetController;
+	}
+	return AttributeMenuWidgetController;
 }
 
 void AEcHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
