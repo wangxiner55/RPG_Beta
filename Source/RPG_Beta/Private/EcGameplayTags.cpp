@@ -65,4 +65,35 @@ void FEcGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attributes_Primary_Vigor = UGameplayTagsManager::Get().AddNativeGameplayTag
 	(FName("Attributes.Primary.Vigor"),
 		FString("Armor"));
+
+
+
+	/*
+	* Input Tags
+	*/
+
+
+	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("InputTag.LMB"),
+		FString("Input Tag For Left Mouse Button"));
+
+	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("InputTag.RMB"),
+		FString("Input Tag For Right Mouse Button"));
+
+	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("InputTag.1"),
+		FString("Input Tag For  Key 1"));
+
+	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("InputTag.2"),
+		FString("Input Tag For  Key 2"));
+
+	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("InputTag.3"),
+		FString("Input Tag For  Key 3"));
+
+	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("InputTag.4"),
+		FString("Input Tag For  Key 4"));
 }

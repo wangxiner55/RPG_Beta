@@ -50,8 +50,11 @@ void AEcCharacterBase::InitializeDefaultAttributes() const
 	ApplyEffectToSelf(DefaultVitalAttributes, 1.0f);
 }
 
-void AEcCharacterBase::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StarupAbilities)
+void AEcCharacterBase::AddCharacterAbilities()
 {
+	UEcAbilitySystemComponent* ASC = Cast<UEcAbilitySystemComponent>(AbilitySystemComponent);
 	if (!HasAuthority()) return;
+
+	ASC->AddCharacterAbilities(StarupAbilities);
 }
 

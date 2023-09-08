@@ -9,7 +9,7 @@
 #include "EcCharacterBase.generated.h"
 
 
-
+class UGameplayAbility;
 class UAbilitySystemComponent;
 class UAttributeSet;
 class UGameplayEffect;
@@ -59,11 +59,13 @@ protected:
 
 
 
-	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StarupAbilities);
+	void AddCharacterAbilities();
 public:	
 
 private:
+	
 
+	UPROPERTY(EditAnyWhere ,Category = "Attributes")
 	TArray<TSubclassOf<UGameplayAbility>> StarupAbilities;
 
 
