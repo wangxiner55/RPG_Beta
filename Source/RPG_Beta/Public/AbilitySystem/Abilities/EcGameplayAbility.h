@@ -13,5 +13,11 @@ UCLASS()
 class RPG_BETA_API UEcGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
+
+
+public:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	FGameplayTag StartupInputTag;
 	
 };
