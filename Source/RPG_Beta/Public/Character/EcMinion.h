@@ -12,7 +12,7 @@
  * 
  */
 UCLASS()
-class RPG_BETA_API AEcMinion : public AEcCharacterBase , public IMinionInterface
+class RPG_BETA_API AEcMinion : public AEcCharacterBase , public IMinionInterface 
 {
 	GENERATED_BODY()
 	
@@ -20,28 +20,44 @@ class RPG_BETA_API AEcMinion : public AEcCharacterBase , public IMinionInterface
 public:
 	AEcMinion();
 
-	/* Minion Interface*/
+
+/*
+*	Interface Implement
+*/
+
+	//Minion Interface
+
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
-	/* End Minion Interface*/
 
-	/* Combat Interface*/
+
+	//Combat Interface
+
 	virtual int32 GetPlayerLevel() override;
-	/* Combat Interface*/
+
 
 protected:
 
 	virtual void BeginPlay() override;
 
+/*
+*	GAS Module
+*/
+	//Initialization bind of each GAS module
 	virtual void InitAbilityActorInfo() override;
 
 public:
 
+/*
+*	Interface Implement
+*/
 
+
+	//Minion Interface
 	UPROPERTY(BlueprintReadOnly)
 		bool bHighlighted = false;
 
-
+	//Combat Interface
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
 		int32 Level = 1;
 

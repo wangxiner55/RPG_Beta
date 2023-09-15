@@ -10,13 +10,19 @@
 
 AEcPlayerState::AEcPlayerState()
 {
+/*
+*	Net Update
+*/
 	NetUpdateFrequency = 100.f;
 
+/*
+*	GAS Module
+*/
 	AbilitySystemComponent = CreateDefaultSubobject<UEcAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
-
+	//	Binding the as we created to the gas system
 	AttributeSet = CreateDefaultSubobject<UEcAttributeSet>("AttributeSet");
 }
 

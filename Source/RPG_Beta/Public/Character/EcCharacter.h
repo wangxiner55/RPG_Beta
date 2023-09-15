@@ -20,12 +20,21 @@ public:
 	AEcCharacter();
 	
 
+/*
+*	At Server And Client Set possess By
+*/
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 
-	/* Comabt Interface*/
+/*
+*	Interface Implement
+*/
 	virtual int32 GetPlayerLevel() override;
-	/* Comabt Interface*/
+
 private:
+
+/*
+*	Initialization of each ASC module
+*/
 	virtual void InitAbilityActorInfo() override;
 };

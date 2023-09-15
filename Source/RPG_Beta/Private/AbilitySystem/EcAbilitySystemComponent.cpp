@@ -5,23 +5,17 @@
 #include "AbilitySystem/Abilities/EcGameplayAbility.h"
 #include "GameplayAbilitySpec.h"
 
+
+
+/*
+*  GE Module
+*/
 void UEcAbilitySystemComponent::AbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UEcAbilitySystemComponent::ClientEffectAppliced);
 }
 
-void UEcAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StarupAbilities)
-{
-	for (const TSubclassOf<UGameplayAbility> AbilityClass : StarupAbilities)
-	{
-		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
-		if(const UEcGameplayAbility* EcAbility = Cast<UEcGameplayAbility>(AbilitySpec.Ability))
-		{
-			AbilitySpec.DynamicAbilityTags.AddTag(EcAbility->StartupInputTag);
-			GiveAbility(AbilitySpec);
-		}
-	}
-}
+
 
 void UEcAbilitySystemComponent::ClientEffectAppliced_Implementation(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
 {
@@ -29,6 +23,25 @@ void UEcAbilitySystemComponent::ClientEffectAppliced_Implementation(UAbilitySyst
 	//EffectSpec.GetAllAssetTags(TagContainer);
 	EffectSpec.GetAllGrantedTags(TagContainer);
 	EffectAssetTags.Broadcast(TagContainer);
+}
+
+
+
+/*
+*   GA Module
+*/
+
+void UEcAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StarupAbilities)
+{
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : StarupAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		if (const UEcGameplayAbility* EcAbility = Cast<UEcGameplayAbility>(AbilitySpec.Ability))
+		{
+			AbilitySpec.DynamicAbilityTags.AddTag(EcAbility->StartupInputTag);
+			GiveAbility(AbilitySpec);
+		}
+	}
 }
 
 void UEcAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)

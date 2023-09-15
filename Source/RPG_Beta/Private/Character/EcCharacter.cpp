@@ -20,6 +20,10 @@ AEcCharacter::AEcCharacter()
 	bUseControllerRotationYaw = false;
 }
 
+
+/*
+*	Possess
+*/
 void AEcCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -38,14 +42,12 @@ void AEcCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
-int32 AEcCharacter::GetPlayerLevel()
-{
-	const AEcPlayerState* EcPlayerState = GetPlayerState<AEcPlayerState>();
-	check(EcPlayerState);
-	return EcPlayerState->GetPlayerLevel();
-	
-}
 
+/*
+*	GAS Module
+*/
+
+//Initialization of each ASC module
 void AEcCharacter::InitAbilityActorInfo()
 {
 
@@ -68,4 +70,15 @@ void AEcCharacter::InitAbilityActorInfo()
 	}
 
 	
+}
+
+/*
+*	Actor Info
+*/
+int32 AEcCharacter::GetPlayerLevel()
+{
+	const AEcPlayerState* EcPlayerState = GetPlayerState<AEcPlayerState>();
+	check(EcPlayerState);
+	return EcPlayerState->GetPlayerLevel();
+
 }

@@ -3,6 +3,7 @@
 
 #include "EcAssetManager.h"
 #include "EcGameplayTags.h"
+#include "AbilitySystemGlobals.h"
 
 UEcAssetManager& UEcAssetManager::Get()
 {
@@ -19,4 +20,6 @@ void UEcAssetManager::StartInitialLoading()
 	Super::StartInitialLoading();
 
 	FEcGameplayTags::InitializeNativeGameplayTags();
+
+	UAbilitySystemGlobals::Get().InitGlobalData();
 }

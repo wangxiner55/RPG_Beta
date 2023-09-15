@@ -21,6 +21,10 @@ AEcPlayerController::AEcPlayerController()
 	Spline = CreateDefaultSubobject<USplineComponent>("Spline");
 }
 
+
+/*
+*	Basic logic of Controller
+*/
 void AEcPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
@@ -51,15 +55,28 @@ void AEcPlayerController::BeginPlay()
 	SetInputMode(InputModeData);
 }
 
+
+
+
+
+/*
+*  Bind
+*/
 void AEcPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	PlayerInputComponent = InputComponent;
 	UEcInputComponent* EcPlayerInput = CastChecked<UEcInputComponent>(InputComponent);
 	EcPlayerInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AEcPlayerController::Move);
+	EcPlayerInput->BindAction(ShiftAction, ETriggerEvent::Started, this, &AEcPlayerController::ShiftPressed);
+	EcPlayerInput->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AEcPlayerController::ShiftReleased);
 	EcPlayerInput->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
+
+/*
+*  Base Movement
+*/
 void AEcPlayerController::Move(const FInputActionValue& InputActionValue)
 {
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
@@ -77,6 +94,12 @@ void AEcPlayerController::Move(const FInputActionValue& InputActionValue)
 
 }
 
+
+
+
+/*
+*  Tool
+*/
 void AEcPlayerController::CursorTrace()
 {
 	
@@ -94,6 +117,10 @@ void AEcPlayerController::CursorTrace()
 
 }
 
+
+/*
+*  Gameplay Ability System Implement
+*/
 void AEcPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
 	if(InputTag.MatchesTagExact(FEcGameplayTags::Get().InputTag_LMB))
@@ -111,13 +138,11 @@ void AEcPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		return;
 	}
 
-	if (bTargeting)
-	{
-		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
+	if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
 
-	}
-	else
+	if (!bTargeting && !bShiftKeyDown)
 	{
+		
 		const APawn* ControllerPawn = GetPawn();
 		if (FollowTime <= ShortPressThreshold && ControllerPawn)
 		{
@@ -130,11 +155,13 @@ void AEcPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
 				}
 				bAutoRuning = true;
+				if (NavPath->PathPoints.Num() == 0)return;
 				CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
 			}
 			FollowTime = 0.f;
 			bTargeting = false;
 		}
+
 	}
 }
 
@@ -146,7 +173,7 @@ void AEcPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 	}

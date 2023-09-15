@@ -24,14 +24,22 @@ public:
 
 public:
 
+/*
+*  GE Module
+*/
 	void AbilityActorInfoSet();
 
-	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StarupAbilities);
-
 	UFUNCTION(Client, Reliable)
-	void ClientEffectAppliced(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
-	
+		void ClientEffectAppliced(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 
+
+/*
+* GA Module
+*/
+
+
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StarupAbilities);
+	//Bind Input Action By InputTag
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 };

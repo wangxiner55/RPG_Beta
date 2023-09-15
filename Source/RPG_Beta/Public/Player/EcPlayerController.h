@@ -42,31 +42,52 @@ protected:
 
 private:
 
-	UPROPERTY(EditAnywhere, Category="Input")
-	TObjectPtr<UInputMappingContext> EcContext;
+/*
+*	ASC Module
+*/
 
+	UEcAbilitySystemComponent* GetASC();
+
+	UPROPERTY()
+		TObjectPtr<UEcAbilitySystemComponent> EcAbilitySystemComponent;
+	
+
+/*
+*  Action Input Bind
+*/
+
+
+	//context
 	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> MoveAction;
+		TObjectPtr<UInputMappingContext> EcContext;
 
+
+	// Base Movement Input Bind
 	void Move(const FInputActionValue& InputActionValue);
 
-	void CursorTrace();
-	IMinionInterface* LastActor;
-	IMinionInterface* ThisActor;
-	FHitResult CursorHit;
+	UPROPERTY(EditAnywhere, Category = "Input")
+		TObjectPtr<UInputAction> MoveAction;
 
+	// Ability Input Bind
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
 	void AbilityInputTagHeld(FGameplayTag InputTag);
 
-
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	TObjectPtr<UEcInputConfig> InputConfig;
+		TObjectPtr<UEcInputConfig> InputConfig;
 
-	UPROPERTY()
-	TObjectPtr<UEcAbilitySystemComponent> EcAbilitySystemComponent;
 
-	UEcAbilitySystemComponent* GetASC();
+	// Fore Attack Bind
+	FORCEINLINE void ShiftPressed() { bShiftKeyDown = true; };
+	FORCEINLINE void ShiftReleased() { bShiftKeyDown = false; };
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+		TObjectPtr<UInputAction> ShiftAction;
+
+
+/*
+*  Curson Move
+*/
 
 	FVector CachedDestination = FVector::ZeroVector;
 	float FollowTime = 0.f;
@@ -76,17 +97,26 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 		float AutoRunAcceptanceRadius = 50.f;
 
-	
-
 	bool bTargeting = false;
 
 	void AutoRun();
 
 
+/*
+*  Set hit target
+*/
+
+	void CursorTrace();
+
+	IMinionInterface* LastActor;
+	IMinionInterface* ThisActor;
+	FHitResult CursorHit;
+	bool bShiftKeyDown = false;
 
 
-
-
+/*
+*  Debug Out Module
+*/
 
 
 	TObjectPtr<UInputComponent> PlayerInputComponent;
