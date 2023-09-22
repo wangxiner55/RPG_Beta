@@ -58,12 +58,10 @@ UAttributeMenuWidgetController* UEcAbilitySystemBlueprintLibrary::GetAttributeMe
 
 void UEcAbilitySystemBlueprintLibrary::InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC)
 {
-	AEcGameModeBase* GameMode = Cast<AEcGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (GameMode == nullptr) return;
+	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
 
 	AActor* AvatarActor = ASC->GetAvatarActor();
 
-	UCharacterClassInfo* CharacterClassInfo = GameMode->CharacterClassInfo;
 	FCharacterClassDefaultInfo ClassDefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
 
 	check(ClassDefaultInfo.PrimaryAttributes);
@@ -88,15 +86,20 @@ void UEcAbilitySystemBlueprintLibrary::GiveStartupAbilities(const UObject* World
 {
 	
 	if (ASC == nullptr) return;
+	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
 
-	AEcGameModeBase* GameMode = Cast<AEcGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (GameMode == nullptr) return;
-
-	UCharacterClassInfo* CharacterClassInfo = GameMode->CharacterClassInfo;
 	for (TSubclassOf<UGameplayAbility> AbilityClass : CharacterClassInfo->CommonAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 		ASC->GiveAbility(AbilitySpec);
 	}
 
+}
+
+UCharacterClassInfo* UEcAbilitySystemBlueprintLibrary::GetCharacterClassInfo(const UObject* WorldContextObject)
+{
+	AEcGameModeBase* GameMode = Cast<AEcGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (GameMode == nullptr) return nullptr;
+
+	return GameMode->CharacterClassInfo;
 }
