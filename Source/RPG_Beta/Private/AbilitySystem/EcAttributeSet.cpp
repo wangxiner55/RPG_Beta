@@ -8,6 +8,9 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/Character.h"
 #include "EcGameplayTags.h"
+#include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/EcPlayerController.h"
 
 UEcAttributeSet::UEcAttributeSet()
 {
@@ -65,6 +68,14 @@ void UEcAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, Mana, COND_None, REPNOTIFY_Always);
 
+
+
+	/*
+	*	Meta Attributes
+	*/
+
+
+
 }
 
 void UEcAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -92,10 +103,42 @@ void UEcAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
 		UE_LOG(LogTemp, Warning, TEXT("Change Health on %s, health: %f"), *Props.TargetAvatarActor->GetName(), GetHealth());
+
+		UE_LOG(LogTemp, Warning, TEXT("Change Strength on %s, Strength: %f"), *Props.TargetAvatarActor->GetName(), GetStrength());
 	}
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	}
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		const float LocalIncomingDamage = GetIncomingDamage();
+		SetIncomingDamage(0.f);
+		if (LocalIncomingDamage > 0.f)
+		{
+			const float NewHealth = GetHealth() - LocalIncomingDamage;
+			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+			const bool bFatal = NewHealth <= 0.f;
+			if (bFatal)
+			{
+				ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor);
+				if (CombatInterface)
+				{
+					CombatInterface->Die();
+				}
+			}
+			else
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FEcGameplayTags::Get().Attack_HitReact);
+				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
+			if (Props.SourceCharacter != Props.TargetCharacter)
+			{
+				ShowDamageTextWidget(Props, LocalIncomingDamage);
+			}
+		}
 	}
 }
 
@@ -194,7 +237,6 @@ void UEcAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
 
 
 
-
 void UEcAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
 {
 
@@ -224,5 +266,14 @@ void UEcAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& 
 		Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
 		Props.TargetCharacter = Cast<ACharacter>(Props.TargetAvatarActor);
 		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
+	}
+}
+
+void UEcAttributeSet::ShowDamageTextWidget(const FEffectProperties& Props, float Damage)
+{
+	AEcPlayerController* PC = Cast<AEcPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0));
+	if (PC)
+	{
+		PC->ShowDamageWidget(Damage, Props.TargetCharacter);
 	}
 }

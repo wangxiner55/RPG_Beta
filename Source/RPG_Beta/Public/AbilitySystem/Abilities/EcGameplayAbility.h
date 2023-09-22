@@ -18,6 +18,11 @@ class RPG_BETA_API UEcGameplayAbility : public UGameplayAbility
 public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	FGameplayTag StartupInputTag;
+		FGameplayTag StartupInputTag;
 	
+
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+		FScalableFloat Damage;
+
 };

@@ -35,16 +35,27 @@ public:
 
 	virtual int32 GetPlayerLevel() override;
 
+	virtual void Die() override;
+
 
 protected:
 
 	virtual void BeginPlay() override;
 
 /*
+* 
 *	GAS Module
+* 
 */
 	//Initialization bind of each GAS module
 	virtual void InitAbilityActorInfo() override;
+
+/*
+*	AS
+*/
+
+	virtual void InitializeDefaultAttributes()const override;
+
 
 public:
 
@@ -58,7 +69,7 @@ public:
 		bool bHighlighted = false;
 
 	//Combat Interface
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
-		int32 Level = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+		float LifeSpan =  5.0f;
 
 };

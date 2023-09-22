@@ -8,6 +8,13 @@
 #include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "Player/EcPlayerState.h"
 #include "AbilitySystem/EcAbilitySystemComponent.h"
+#include "Game/EcGameModeBase.h"
+#include "AbilitySystemComponent.h"
+
+
+/*
+*	Widget
+*/
 
 UEcOverlayWidgetController* UEcAbilitySystemBlueprintLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
 {
@@ -43,4 +50,51 @@ UAttributeMenuWidgetController* UEcAbilitySystemBlueprintLibrary::GetAttributeMe
 		}
 	}
 	return nullptr;
+}
+
+/*
+*	Character
+*/
+
+void UEcAbilitySystemBlueprintLibrary::InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC)
+{
+	AEcGameModeBase* GameMode = Cast<AEcGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (GameMode == nullptr) return;
+
+	AActor* AvatarActor = ASC->GetAvatarActor();
+
+	UCharacterClassInfo* CharacterClassInfo = GameMode->CharacterClassInfo;
+	FCharacterClassDefaultInfo ClassDefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
+
+	check(ClassDefaultInfo.PrimaryAttributes);
+	FGameplayEffectContextHandle PrimaryAttributeContextHandle = ASC->MakeEffectContext();
+	PrimaryAttributeContextHandle.AddSourceObject(AvatarActor);
+	const FGameplayEffectSpecHandle PrimaryAttributesSpecHandle = ASC->MakeOutgoingSpec(ClassDefaultInfo.PrimaryAttributes, Level, PrimaryAttributeContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*PrimaryAttributesSpecHandle.Data.Get());
+
+	FGameplayEffectContextHandle SecondaryAttributeContextHandle = ASC->MakeEffectContext();
+	SecondaryAttributeContextHandle.AddSourceObject(AvatarActor);
+	const FGameplayEffectSpecHandle SecondaryAttributesSpecHandle = ASC->MakeOutgoingSpec(CharacterClassInfo->SecondaryAttributes, Level, SecondaryAttributeContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttributesSpecHandle.Data.Get());
+
+	FGameplayEffectContextHandle VitalAttributeContextHandle = ASC->MakeEffectContext();
+	VitalAttributeContextHandle.AddSourceObject(AvatarActor);
+	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = ASC->MakeOutgoingSpec(CharacterClassInfo->VitalAttributes, Level, VitalAttributeContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
+
+}
+
+void UEcAbilitySystemBlueprintLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC)
+{
+
+	AEcGameModeBase* GameMode = Cast<AEcGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (GameMode == nullptr) return;
+
+	UCharacterClassInfo* CharacterClassInfo = GameMode->CharacterClassInfo;
+	for (TSubclassOf<UGameplayAbility> AbilityClass : CharacterClassInfo->CommonAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		ASC->GiveAbility(AbilitySpec);
+	}
+
 }

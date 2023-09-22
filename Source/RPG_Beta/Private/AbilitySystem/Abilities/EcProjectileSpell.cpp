@@ -1,11 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 #include "Actor/EcProjectlile.h"
 #include "Interaction/CombatInterface.h"
 #include "AbilitySystem/Abilities/EcProjectileSpell.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
-
+#include "EcGameplayTags.h"
 
 
 
@@ -48,6 +47,9 @@ void UEcProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		FGameplayEffectContextHandle EffectHandle = SourceASC->MakeEffectContext();
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectHandle);
+		FEcGameplayTags GameplayTags = FEcGameplayTags::Get();
+		const float LocalDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Attack_Damage, LocalDamage);
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 
 		Projectile->FinishSpawning(SpawnTransform);

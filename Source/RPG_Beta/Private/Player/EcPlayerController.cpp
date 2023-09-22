@@ -12,7 +12,8 @@
 #include "AbilitySystem/EcAbilitySystemComponent.h"
 #include "Components/SplineComponent.h"
 #include "NavigationPath.h"
-
+#include "GameFramework/Character.h"
+#include "UI/Widget/DamageWidgetComponent.h"
 
 AEcPlayerController::AEcPlayerController()
 {
@@ -32,6 +33,18 @@ void AEcPlayerController::PlayerTick(float DeltaTime)
 	CursorTrace();
 
 	AutoRun();
+}
+
+void AEcPlayerController::ShowDamageWidget_Implementation(float DamageValue, ACharacter* TargetCharacter)
+{
+	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	{
+		UDamageWidgetComponent* DamageText = NewObject<UDamageWidgetComponent>(TargetCharacter, DamageTextComponentClass);
+		DamageText->RegisterComponent();
+		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DamageText->SetDamageText(DamageValue);
+	}
 }
 
 void AEcPlayerController::BeginPlay()

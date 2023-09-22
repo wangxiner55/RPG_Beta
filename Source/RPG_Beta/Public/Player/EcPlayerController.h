@@ -12,7 +12,7 @@
  * 
  */
 
-
+class UDamageWidgetComponent;
 class UEcAbilitySystemComponent;
 struct FGameplayTag;
 class UEcInputConfig;
@@ -35,6 +35,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		TObjectPtr<USplineComponent> Spline;
 
+	UFUNCTION(Client, Reliable)
+		void ShowDamageWidget(float DamageValue, ACharacter* TargetCharacter);
 protected:
 
 	virtual void BeginPlay() override;
@@ -112,6 +114,9 @@ private:
 	IMinionInterface* ThisActor;
 	FHitResult CursorHit;
 	bool bShiftKeyDown = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageWidgetComponent> DamageTextComponentClass;
 
 
 /*

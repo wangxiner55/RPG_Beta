@@ -9,6 +9,9 @@
 #include "../RPG_Beta.h"
 #include "Components/WidgetComponent.h"
 #include "AbilitySystem/EcAttributeSet.h"
+#include "EcGameplayTags.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "AbilitySystem/EcAbilitySystemBlueprintLibrary.h"
 
 // Sets default values
 AEcCharacterBase::AEcCharacterBase()
@@ -34,11 +37,60 @@ AEcCharacterBase::AEcCharacterBase()
 	HealthBar->SetupAttachment(GetRootComponent());
 }
 
+UAnimMontage* AEcCharacterBase::GetHitReactMontage_Implementation()
+{
+	return HitReactMontage;
+}
+
+void AEcCharacterBase::Die()
+{
+	if (Weapon)
+	{
+		Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+	}
+	MulticastHandleDeath();
+}
+
+void AEcCharacterBase::Dissolve()
+{
+	if (IsValid(DissolveMaterialInstance))
+	{
+		UMaterialInstanceDynamic* DynamicMatInst = UMaterialInstanceDynamic::Create(DissolveMaterialInstance, this);
+		GetMesh()->SetMaterial(0, DynamicMatInst);
+		StartDissolveTimeline(DynamicMatInst);
+	}
+	if (IsValid(WeaponDissolveMaterialInstance))
+	{
+		UMaterialInstanceDynamic* DynamicMatInst = UMaterialInstanceDynamic::Create(WeaponDissolveMaterialInstance, this);
+		Weapon->SetMaterial(0, DynamicMatInst);
+		StartWeaponDissolveTimeline(DynamicMatInst);
+	}
+}
+
+void AEcCharacterBase::MulticastHandleDeath_Implementation()
+{
+	if (Weapon)
+	{
+		Weapon->SetSimulatePhysics(true);
+		Weapon->SetEnableGravity(true);
+		Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	}
+
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
+	Dissolve();
+}
+
 void AEcCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+	UEcAbilitySystemBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 
 /*
 *	Health Bar       Widget Controller Value Bind Call Back
@@ -64,6 +116,9 @@ void AEcCharacterBase::BeginPlay()
 				OnMaxHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
+
+		AbilitySystemComponent->RegisterGameplayTagEvent(FEcGameplayTags::Get().Attack_HitReact, EGameplayTagEventType::AnyCountChange)
+			.AddUObject(this, &AEcCharacterBase::HitReactTagChanged);
 
 		// Initialize Value
 		OnHealthChanged.Broadcast(EcAS->GetHealth());
@@ -109,21 +164,21 @@ UAbilitySystemComponent* AEcCharacterBase::GetAbilitySystemComponent() const
 *  GE Module
 */
 
-// Initialition ASes By AE
+// Initialition ASes By GE
 void AEcCharacterBase::InitializeDefaultAttributes() const
 {
 	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.0f);
 	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.0f);
 	ApplyEffectToSelf(DefaultVitalAttributes, 1.0f);
 }
-// Initialition AS By AE
-void AEcCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffect, float Level) const
+// Initialition AS By GE
+void AEcCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffect, float PlayerLevel) const
 {
 	check(IsValid(GetAbilitySystemComponent()));
 	//check(GameplayEffect);
 	FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
 	ContextHandle.AddSourceObject(this);
-	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffect, Level, ContextHandle);
+	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffect, PlayerLevel, ContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 }
 
@@ -137,6 +192,16 @@ void AEcCharacterBase::AddCharacterAbilities()
 	if (!HasAuthority()) return;
 
 	ASC->AddCharacterAbilities(StarupAbilities);
+}
+
+
+/*
+*	GT
+*/
+void AEcCharacterBase::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
 }
 
 void AEcCharacterBase::InitAbilityActorInfo()

@@ -4,7 +4,7 @@
 #include "Character/EcMinion.h"
 #include "AbilitySystem/EcAbilitySystemComponent.h"
 #include "AbilitySystem/EcAttributeSet.h"
-
+#include "AbilitySystem/EcAbilitySystemBlueprintLibrary.h"
 
 AEcMinion::AEcMinion()
 {
@@ -26,9 +26,10 @@ AEcMinion::AEcMinion()
 
 void AEcMinion::BeginPlay()
 {
+	InitAbilityActorInfo();
 	Super::BeginPlay();
 
-	InitAbilityActorInfo();
+	
 }
 
 
@@ -56,6 +57,12 @@ int32 AEcMinion::GetPlayerLevel()
 	return Level;
 }
 
+void AEcMinion::Die()
+{
+	SetLifeSpan(LifeSpan);
+	Super::Die();
+}
+
 
 /*
 * 
@@ -69,4 +76,12 @@ void AEcMinion::InitAbilityActorInfo()
 	Cast<UEcAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
 	InitializeDefaultAttributes();
+}
+
+/*
+*  AS
+*/
+void AEcMinion::InitializeDefaultAttributes() const
+{
+	UEcAbilitySystemBlueprintLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
 }
