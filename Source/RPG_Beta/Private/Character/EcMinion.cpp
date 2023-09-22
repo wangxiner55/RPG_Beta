@@ -28,7 +28,7 @@ void AEcMinion::BeginPlay()
 {
 	InitAbilityActorInfo();
 	Super::BeginPlay();
-
+	
 	
 }
 

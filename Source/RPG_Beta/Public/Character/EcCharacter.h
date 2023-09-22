@@ -19,7 +19,7 @@ class RPG_BETA_API AEcCharacter : public AEcCharacterBase
 public:
 	AEcCharacter();
 	
-
+	
 /*
 *	At Server And Client Set possess By
 */
@@ -30,6 +30,10 @@ public:
 *	Interface Implement
 */
 	virtual int32 GetPlayerLevel() override;
+
+
+protected:
+	virtual void BeginPlay() override;
 
 private:
 

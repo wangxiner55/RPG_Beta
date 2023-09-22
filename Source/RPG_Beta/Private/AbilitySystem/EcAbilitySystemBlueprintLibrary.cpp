@@ -86,6 +86,8 @@ void UEcAbilitySystemBlueprintLibrary::InitializeDefaultAttributes(const UObject
 
 void UEcAbilitySystemBlueprintLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC)
 {
+	
+	if (ASC == nullptr) return;
 
 	AEcGameModeBase* GameMode = Cast<AEcGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (GameMode == nullptr) return;

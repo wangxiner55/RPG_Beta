@@ -7,6 +7,7 @@
 #include "Player/EcPlayerState.h"
 #include "UI/HUD/EcHUD.h"
 #include "AbilitySystem/EcAbilitySystemComponent.h"
+#include "AbilitySystem/EcAbilitySystemBlueprintLibrary.h"
 
 AEcCharacter::AEcCharacter()
 {
@@ -19,6 +20,12 @@ AEcCharacter::AEcCharacter()
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
 }
+
+void AEcCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 
 
 /*
@@ -40,6 +47,7 @@ void AEcCharacter::OnRep_PlayerState()
 
 	// Init ability actor info for the Client
 	InitAbilityActorInfo();
+	
 }
 
 
@@ -82,3 +90,4 @@ int32 AEcCharacter::GetPlayerLevel()
 	return EcPlayerState->GetPlayerLevel();
 
 }
+

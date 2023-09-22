@@ -90,11 +90,13 @@ void AEcCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
-	UEcAbilitySystemBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	UEcAbilitySystemBlueprintLibrary::GiveStartupAbilities(this, GetAbilitySystemComponent());
 
 /*
 *	Health Bar       Widget Controller Value Bind Call Back
 */
+
+	if (GetAttributeSet() == nullptr) return;
 	if (UEcUserWidget* EcUserWidget = Cast<UEcUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
 		EcUserWidget->SetWidgetController(this);
