@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Abilities/EcGameplayAbility.h"
+#include "AbilitySystem/Abilities/EcDamageGameplayAbility.h"
 #include "EcProjectileSpell.generated.h"
 
 
@@ -13,7 +13,7 @@ class AEcProjectlile;
  * 
  */
 UCLASS()
-class RPG_BETA_API UEcProjectileSpell : public UEcGameplayAbility
+class RPG_BETA_API UEcProjectileSpell : public UEcDamageGameplayAbility
 {
 	GENERATED_BODY()
 	
@@ -33,9 +33,7 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Projectile")
 		void SpawnProjectile(const FVector& ProjectileTargetLocation);
 
-	// GE
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		TSubclassOf<UGameplayEffect> DamageEffectClass;
+	
 
 
 

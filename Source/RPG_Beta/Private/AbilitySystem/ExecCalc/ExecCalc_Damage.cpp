@@ -18,14 +18,44 @@ struct EcDamageStatics
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitResistance);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitDamage);
 
+	//Resistance Attributes
+	DECLARE_ATTRIBUTE_CAPTUREDEF(FireResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(LightningResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(PhysicalResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(ArcaneResistance);
+
+	TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition> TagsToCaptureDefs;
+
 	EcDamageStatics()
 	{
+		//Secondary Attributes
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UEcAttributeSet, Armor, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UEcAttributeSet, BlockChance, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UEcAttributeSet, ArmorPenetration, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UEcAttributeSet, CriticalHitChance, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UEcAttributeSet, CriticalHitResistance, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UEcAttributeSet, CriticalHitDamage, Source, false);
+
+		// Resistance Attribute
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UEcAttributeSet, FireResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UEcAttributeSet, LightningResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UEcAttributeSet, PhysicalResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UEcAttributeSet, ArcaneResistance, Target, false);
+
+
+		// Map Tag To AttCapturedef
+		const FEcGameplayTags& Tags = FEcGameplayTags::Get();
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_Armor, ArmorDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_BlockChance, BlockChanceDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_ArmorPenetration, ArmorPenetrationDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CriticalHitChance, CriticalHitChanceDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CriticalHitResistance, CriticalHitResistanceDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CriticalHitDamage, CriticalHitDamageDef);
+
+		TagsToCaptureDefs.Add(Tags.Attributes_Resistance_Fire, FireResistanceDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Resistance_Arcane, LightningResistanceDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Resistance_Physical, PhysicalResistanceDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Resistance_Lightning, ArcaneResistanceDef);
 	}
 };
 
@@ -43,6 +73,12 @@ UExecCalc_Damage::UExecCalc_Damage()
 	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitChanceDef);
 	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitDamageDef);
 	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitResistanceDef);
+
+	//Resistance 
+	RelevantAttributesToCapture.Add(DamageStatics().ArcaneResistanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().PhysicalResistanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().LightningResistanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().FireResistanceDef);
 }
 
 void UExecCalc_Damage::Execute_Implementation(
@@ -67,7 +103,24 @@ void UExecCalc_Damage::Execute_Implementation(
 
 	//Calculate Attribute Magnitude
 	//Source Damage
-	float Damage = Spec.GetSetByCallerMagnitude(FEcGameplayTags::Get().Attack_Damage);
+	float Damage = 0;
+	for (auto& Pair : FEcGameplayTags::Get().DamageTypesToResistances)
+	{
+		const FGameplayTag DamageTypeTag = Pair.Key;
+		const FGameplayTag ResistanceTag = Pair.Value;
+		const FGameplayEffectAttributeCaptureDefinition CaptureDef = EcDamageStatics().TagsToCaptureDefs[ResistanceTag];
+
+		float Resistance = 0.f;
+		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDef, EvaluationParameters, Resistance);
+		Resistance = FMath::Max<float>(0.f, Resistance);
+
+
+		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeTag);
+
+		DamageTypeValue *= (100.f - Resistance) / 100.f;
+
+		Damage += DamageTypeValue;
+	}
 
 	// Armor
 	float TargetArmor = 0.f;
@@ -79,10 +132,14 @@ void UExecCalc_Damage::Execute_Implementation(
 	float TargetBlockChance = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().BlockChanceDef, EvaluationParameters, TargetBlockChance);
 	TargetBlockChance = FMath::Max<float>(0.f, TargetBlockChance);
+
+	
+
 	// Block Damage
 	const bool bBlocked = FMath::RandRange(1, 100) < TargetBlockChance;
 	Damage = bBlocked ? 0.f : Damage;
-
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
+	UEcAbilitySystemBlueprintLibrary::SetIsBlockedHit(EffectContextHandle, bBlocked);
 
 	// SourceArmorPenetration
 	UCharacterClassInfo* CharacterClassInfo = UEcAbilitySystemBlueprintLibrary::GetCharacterClassInfo(SourceAvatar);
@@ -119,6 +176,8 @@ void UExecCalc_Damage::Execute_Implementation(
 
 	const float EffectiveCriticalHitChance = SourceCriticalHitChance - TargetCriticalHitResistance * EffectiveHitResistanceCoefficient;
 	const bool bCriticalHit = FMath::RandRange(1, 100) < EffectiveCriticalHitChance;
+	// Send Message Of CriticalHit
+	UEcAbilitySystemBlueprintLibrary::SetIsCriticaldHit(EffectContextHandle, bCriticalHit);
 
 	Damage = bCriticalHit ? 2.f * Damage + SourceCriticalHitDamage : Damage;
 

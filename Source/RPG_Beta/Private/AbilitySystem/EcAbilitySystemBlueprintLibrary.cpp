@@ -9,6 +9,7 @@
 #include "Player/EcPlayerState.h"
 #include "AbilitySystem/EcAbilitySystemComponent.h"
 #include "Game/EcGameModeBase.h"
+#include "EcAbilityTypes.h"
 #include "AbilitySystemComponent.h"
 
 
@@ -102,4 +103,38 @@ UCharacterClassInfo* UEcAbilitySystemBlueprintLibrary::GetCharacterClassInfo(con
 	if (GameMode == nullptr) return nullptr;
 
 	return GameMode->CharacterClassInfo;
+}
+
+bool UEcAbilitySystemBlueprintLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FEcGameplayEffectContext* EcEffectContext = StaticCast<const FEcGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EcEffectContext->IsBlockedHit();
+	}
+	return false;
+}
+
+bool UEcAbilitySystemBlueprintLibrary::IsCriticaldHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FEcGameplayEffectContext* EcEffectContext = StaticCast<const FEcGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EcEffectContext->IsCriticalHit();
+	}
+	return false;
+}
+
+void UEcAbilitySystemBlueprintLibrary::SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle,  bool bInIsBlockedHit)
+{
+	if (FEcGameplayEffectContext* EcEffectContext = StaticCast< FEcGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EcEffectContext->SetIsBlockHit(bInIsBlockedHit);
+	}
+}
+
+void UEcAbilitySystemBlueprintLibrary::SetIsCriticaldHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle,  bool bInIsCriticalHit)
+{
+	if (FEcGameplayEffectContext* EcEffectContext = StaticCast< FEcGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EcEffectContext->SetIsCriticalHit(bInIsCriticalHit);
+	}
 }

@@ -36,7 +36,7 @@ public:
 		TObjectPtr<USplineComponent> Spline;
 
 	UFUNCTION(Client, Reliable)
-		void ShowDamageWidget(float DamageValue, ACharacter* TargetCharacter);
+		void ShowDamageWidget(float DamageValue, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
 protected:
 
 	virtual void BeginPlay() override;

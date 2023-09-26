@@ -35,15 +35,15 @@ void AEcPlayerController::PlayerTick(float DeltaTime)
 	AutoRun();
 }
 
-void AEcPlayerController::ShowDamageWidget_Implementation(float DamageValue, ACharacter* TargetCharacter)
+void AEcPlayerController::ShowDamageWidget_Implementation(float DamageValue, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit)
 {
-	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	if (IsValid(TargetCharacter) && DamageTextComponentClass && IsLocalController())
 	{
 		UDamageWidgetComponent* DamageText = NewObject<UDamageWidgetComponent>(TargetCharacter, DamageTextComponentClass);
 		DamageText->RegisterComponent();
 		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		DamageText->SetDamageText(DamageValue);
+		DamageText->SetDamageText(DamageValue, bBlockedHit, bCriticalHit);
 	}
 }
 

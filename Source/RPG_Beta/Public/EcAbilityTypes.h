@@ -14,8 +14,8 @@ public:
 	FORCEINLINE bool IsCriticalHit() const { return bIsCriticalHit; }
 	FORCEINLINE bool IsBlockedHit() const { return bIsBlockedHit; }
 
-	FORCEINLINE void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
-	FORCEINLINE void SetIsBlockHit(bool bInIsBlockHit) { bIsBlockedHit = bInIsBlockHit; }
+	 void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
+	 void SetIsBlockHit(bool bInIsBlockHit) { bIsBlockedHit = bInIsBlockHit; }
 
 	/** Returns the actual struct used for serialization, subclasses must override this! */
 	virtual UScriptStruct* GetScriptStruct() const

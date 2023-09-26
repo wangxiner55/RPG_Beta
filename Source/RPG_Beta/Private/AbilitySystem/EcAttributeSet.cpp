@@ -11,6 +11,8 @@
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/EcPlayerController.h"
+#include "AbilitySystem/EcAbilitySystemBlueprintLibrary.h"
+
 
 UEcAttributeSet::UEcAttributeSet()
 {
@@ -31,6 +33,11 @@ UEcAttributeSet::UEcAttributeSet()
 	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_ManaRegeneration, GetManaRegenerationAttribute);
 	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_MaxHealth, GetMaxHealthAttribute);
 	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_MaxMana, GetMaxManaAttribute);
+
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Arcane, GetArcaneResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Fire, GetFireResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Lightning, GetLightningResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Physical, GetPhysicalResistanceAttribute);
 
 
 }
@@ -71,10 +78,13 @@ void UEcAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 
 
 	/*
-	*	Meta Attributes
+	*	Resistance Attributes
 	*/
 
-
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, FireResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, PhysicalResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, LightningResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEcAttributeSet, ArcaneResistance, COND_None, REPNOTIFY_Always);
 
 }
 
@@ -136,7 +146,9 @@ void UEcAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 			}
 			if (Props.SourceCharacter != Props.TargetCharacter)
 			{
-				ShowDamageTextWidget(Props, LocalIncomingDamage);
+				const bool bBlock = UEcAbilitySystemBlueprintLibrary::IsBlockedHit(Props.EffectContextHandle);
+				const bool bCritical = UEcAbilitySystemBlueprintLibrary::IsCriticaldHit(Props.EffectContextHandle);
+				ShowDamageTextWidget(Props, LocalIncomingDamage, bBlock, bCritical);
 			}
 		}
 	}
@@ -235,6 +247,25 @@ void UEcAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
 }
 
 
+void UEcAttributeSet::OnRep_ArcaneResistance(const FGameplayAttributeData& OldArcaneResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, ArcaneResistance, OldArcaneResistance);
+}
+
+void UEcAttributeSet::OnRep_PhysicalResistance(const FGameplayAttributeData& OldPhysicalResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, PhysicalResistance, OldPhysicalResistance);
+}
+
+void UEcAttributeSet::OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, FireResistance, OldFireResistance);
+}
+
+void UEcAttributeSet::OnRep_LightningResistance(const FGameplayAttributeData& OldLightningResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEcAttributeSet, LightningResistance, OldLightningResistance);
+}
 
 
 void UEcAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
@@ -269,11 +300,11 @@ void UEcAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& 
 	}
 }
 
-void UEcAttributeSet::ShowDamageTextWidget(const FEffectProperties& Props, float Damage)
+void UEcAttributeSet::ShowDamageTextWidget(const FEffectProperties& Props, float Damage, bool bBlockedHit, bool bCriticalHit)
 {
-	AEcPlayerController* PC = Cast<AEcPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0));
+	AEcPlayerController* PC = Cast<AEcPlayerController>((Props.SourceCharacter->Controller));
 	if (PC)
 	{
-		PC->ShowDamageWidget(Damage, Props.TargetCharacter);
+		PC->ShowDamageWidget(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 	}
 }

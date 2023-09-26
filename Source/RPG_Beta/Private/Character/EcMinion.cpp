@@ -75,7 +75,10 @@ void AEcMinion::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UEcAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
-	InitializeDefaultAttributes();
+	if(HasAuthority())
+	{
+		InitializeDefaultAttributes();
+	}
 }
 
 /*

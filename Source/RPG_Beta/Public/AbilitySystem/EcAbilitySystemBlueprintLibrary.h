@@ -36,4 +36,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EcAbilitySystemLibrary|CharacterClassDefaults")
 		static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContextObject);
 
+	UFUNCTION(BlueprintCallable, Category = "EcAbilitySystemLibrary|CharacterClassDefaults")
+		static bool IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	UFUNCTION(BlueprintCallable, Category = "EcAbilitySystemLibrary|CharacterClassDefaults")
+		static bool IsCriticaldHit(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	UFUNCTION(BlueprintCallable, Category = "EcAbilitySystemLibrary|CharacterClassDefaults")
+		static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle,  bool bInIsBlockedHit);
+
+	UFUNCTION(BlueprintCallable, Category = "EcAbilitySystemLibrary|CharacterClassDefaults")
+		static void SetIsCriticaldHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle,  bool bInIsCriticalHit);
 };
