@@ -46,6 +46,15 @@ void UEcProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation
 
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		FGameplayEffectContextHandle EffectHandle = SourceASC->MakeEffectContext();
+		EffectHandle.SetAbility(this);
+		EffectHandle.AddSourceObject(Projectile);
+
+		FHitResult HitResult;
+		HitResult.Location = ProjectileTargetLocation;
+		EffectHandle.AddHitResult(HitResult);
+
+
+
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectHandle);
 		FEcGameplayTags GameplayTags = FEcGameplayTags::Get();
 		const float LocalDamage = Damage.GetValueAtLevel(GetAbilityLevel());
